@@ -14,7 +14,7 @@ class EncryptionHandler {
     public EncryptionHandler() {
     }
 
-    // Pass a MasterPassword to the handler to initialize:
+    // Pass a MasterPassword to the handler to initialize
     public void init(String password) throws Exception {
         // Derive a 256-bit key from the password using SHA-256 hash
         key = new SecretKeySpec(sha256(password), "AES");

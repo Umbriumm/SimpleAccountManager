@@ -34,6 +34,8 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/vcs.xml
+.idea/.gitignore
 *.iws
 *.iml
 *.ipr

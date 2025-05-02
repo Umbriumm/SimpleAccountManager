@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model_old;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

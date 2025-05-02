@@ -1,4 +1,4 @@
-package org.example.model_old;
+package org.example.model;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -42,7 +42,11 @@ class EncryptionHandler {
     }
 
     // Decrypt the message
-    public String Decrypt(String encryptedData) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
+    public String Decrypt(String encryptedData) throws NoSuchPaddingException,
+            NoSuchAlgorithmException, InvalidKeyException,
+            IllegalBlockSizeException, BadPaddingException,
+            InvalidAlgorithmParameterException {
+
         String[] parts = encryptedData.split(":");
         String EncodedIV = parts[0];
         String cipherText = parts[1];

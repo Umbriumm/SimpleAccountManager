@@ -13,11 +13,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.model.CryptographyException;
+import javafx.stage.Modality;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class SimpleJavaFXApp extends Application {
     String passss = "s";
     mainController controller;
-
     ObservableList<Item> data = FXCollections.observableArrayList();
 
     @Override
@@ -62,87 +64,11 @@ public class SimpleJavaFXApp extends Application {
         layout2.setSpacing(10);
         Scene scene2 = new Scene(layout2, 700, 500);
 
-        // ----------------- Scene 3: Edit Account -----------------
-        TextField sl = new TextField();
-        TextField use = new TextField();
-        TextField ps = new TextField();
-        TextField no = new TextField();
-        no.setEditable(false);
-        Button save = new Button("Save");
-        Button back = new Button("Back");
-        HBox editBtnBox = new HBox(10, save, back); // Aligned next to each other
-
-        GridPane s3 = new GridPane();
-        s3.add(new Label("Site"), 0, 0);
-        s3.add(sl, 1, 0);
-        s3.add(new Label("Username"), 0, 1);
-        s3.add(use, 1, 1);
-        s3.add(new Label("Password"), 0, 2);
-        s3.add(ps, 1, 2);
-        s3.add(new Label("Notes"), 0, 3);
-        s3.add(no, 1, 3);
-        s3.add(save, 1, 4);
-        s3.add(back, 2, 4);
-        s3.setAlignment(Pos.CENTER);
-        s3.setHgap(10);
-        s3.setVgap(10);
-        Scene scene3 = new Scene(s3, 600, 400);
-        s3.add(editBtnBox, 1, 4);
-
-
-        // ----------------- Scene 4: Add Account -----------------
-        TextField slAdd = new TextField();
-        TextField useAdd = new TextField();
-        TextField psAdd = new TextField();
-        TextField noAdd = new TextField();
-        Button saveAdd = new Button("Save");
-        Button backAdd = new Button("Back");
-        HBox addBtnBox = new HBox(10, saveAdd, backAdd); // Aligned next to each other
-
-
-        GridPane s4 = new GridPane();
-        s4.add(new Label("Site"), 0, 0);
-        s4.add(slAdd, 1, 0);
-        s4.add(new Label("Username"), 0, 1);
-        s4.add(useAdd, 1, 1);
-        s4.add(new Label("Password"), 0, 2);
-        s4.add(psAdd, 1, 2);
-        s4.add(new Label("Notes"), 0, 3);
-        s4.add(noAdd, 1, 3);
-        s4.add(saveAdd, 1, 4);
-        s4.add(backAdd, 2, 4);
-        s4.setAlignment(Pos.CENTER);
-        s4.setHgap(10);
-        s4.setVgap(10);
-        Scene scene4 = new Scene(s4, 600, 400);
-        s4.add(addBtnBox, 1, 4);
-
-
-        // ----------------- Scene 5: Delete Confirmation -----------------
-        Label delLabel = new Label("Are you sure you want to delete the selected item?");
-        Button yes = new Button("Yes");
-        Button noBtn = new Button("No"); // renamed to avoid variable conflict
-
-        HBox deleteBtns = new HBox(20, yes, noBtn);
-        deleteBtns.setAlignment(Pos.CENTER);
-
-        VBox s5 = new VBox(20, delLabel, deleteBtns);
-        s5.setAlignment(Pos.CENTER);
-        Scene scene5 = new Scene(s5, 400, 200);
-
-
         // ----------------- Button Actions -----------------
         enter.setOnAction(e -> {
             controller = new mainController(mp.getText());
             stage.setScene(scene2);
             stage.setTitle("Dashboard");
-
-//            if (mp.getText().equals(passss)) {
-//                stage.setScene(scene2);
-//                stage.setTitle("Dashboard");
-//            } else {
-//                new Alert(Alert.AlertType.ERROR, "Wrong Password!").showAndWait();
-//            }
         });
 
         exitBtn.setOnAction(e -> {
@@ -150,72 +76,24 @@ public class SimpleJavaFXApp extends Application {
             stage.setTitle("Code Program");
         });
 
-        addBtn.setOnAction(e -> {
-            slAdd.clear();
-            useAdd.clear();
-            psAdd.clear();
-            noAdd.clear();
-            stage.setScene(scene4);
-            stage.setTitle("Add Account");
-        });
-
-        saveAdd.setOnAction(e -> {
-            data.add(new Item(slAdd.getText(), useAdd.getText(), psAdd.getText(), noAdd.getText()));
-            try {
-                controller.insertRecord(slAdd.getText(),useAdd.getText(), psAdd.getText(), noAdd.getText());
-            } catch (CryptographyException ex) {
-
-            }
-            stage.setScene(scene2);
-        });
-
-        backAdd.setOnAction(e -> stage.setScene(scene2));
-
+        addBtn.setOnAction(e -> openAddWindow(stage));
         editBtn.setOnAction(e -> {
             Item selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                sl.setText(selected.getSite());
-                use.setText(selected.getUsername());
-                ps.setText(selected.getPassword());
-                no.setText(selected.getNotes());
-                stage.setScene(scene3);
-                stage.setTitle("Edit Account");
+                openEditWindow(stage, selected);
             } else {
                 new Alert(Alert.AlertType.WARNING, "Please select a row to edit").showAndWait();
             }
         });
 
-        save.setOnAction(e -> {
-            Item selected = table.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                selected.setSite(sl.getText());
-                selected.setUsername(use.getText());
-                selected.setPassword(ps.getText());
-                selected.setNotes(no.getText());
-                table.refresh();
-                stage.setScene(scene2);
-            }
-        });
-
-        back.setOnAction(e -> stage.setScene(scene2));
-
         delBtn.setOnAction(e -> {
             Item selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                stage.setScene(scene5);
-                stage.setTitle("Confirm Delete");
+                openDeleteConfirmation(stage, selected);
             } else {
                 new Alert(Alert.AlertType.WARNING, "Select an item to delete").showAndWait();
             }
         });
-
-        yes.setOnAction(e -> {
-            Item selected = table.getSelectionModel().getSelectedItem();
-            data.remove(selected);
-            stage.setScene(scene2);
-        });
-
-        noBtn.setOnAction(e -> stage.setScene(scene2));
 
         // ----------------- Launch -----------------
         stage.setTitle("Code Program");
@@ -223,26 +101,151 @@ public class SimpleJavaFXApp extends Application {
         stage.show();
     }
 
+    private void openAddWindow(Stage owner) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initOwner(owner);
+        popup.setTitle("Add Account");
+
+        TextField sl = new TextField();
+        TextField use = new TextField();
+        TextField ps = new TextField();
+        TextField no = new TextField();
+
+        Button save = new Button("Save");
+        Button back = new Button("Back");
+        HBox btnBox = new HBox(10, save, back);
+        btnBox.setAlignment(Pos.CENTER);
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Site"), 0, 0);
+        grid.add(sl, 1, 0);
+        grid.add(new Label("Username"), 0, 1);
+        grid.add(use, 1, 1);
+        grid.add(new Label("Password"), 0, 2);
+        grid.add(ps, 1, 2);
+        grid.add(new Label("Notes"), 0, 3);
+        grid.add(no, 1, 3);
+        grid.add(btnBox, 1, 4);
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        save.setOnAction(e -> {
+            Item newItem = new Item(sl.getText(), use.getText(), ps.getText(), no.getText());
+//            ((SimpleJavaFXApp) Application.getUserAgentStylesheet()).data.add(newItem);    Working to solve this part
+            data.add(newItem); // just use it directly
+            try {
+                controller.insertRecord(sl.getText(), use.getText(), ps.getText(), no.getText());
+            } catch (CryptographyException ignored) {}
+            popup.close();
+        });
+
+        back.setOnAction(e -> popup.close());
+
+        popup.setScene(new Scene(grid, 400, 300));
+        popup.showAndWait();
+    }
+
+    private void openEditWindow(Stage owner, Item item) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initOwner(owner);
+        popup.setTitle("Edit Account");
+
+        TextField sl = new TextField(item.getSite());
+        TextField use = new TextField(item.getUsername());
+        TextField ps = new TextField(item.getPassword());
+        TextField no = new TextField(item.getNotes());
+
+        Button save = new Button("Save");
+        Button back = new Button("Back");
+        HBox btnBox = new HBox(10, save, back);
+        btnBox.setAlignment(Pos.CENTER);
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Site"), 0, 0);
+        grid.add(sl, 1, 0);
+        grid.add(new Label("Username"), 0, 1);
+        grid.add(use, 1, 1);
+        grid.add(new Label("Password"), 0, 2);
+        grid.add(ps, 1, 2);
+        grid.add(new Label("Notes"), 0, 3);
+        grid.add(no, 1, 3);
+        grid.add(btnBox, 1, 4);
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        save.setOnAction(e -> {
+            item.setSite(sl.getText());
+            item.setUsername(use.getText());
+            item.setPassword(ps.getText());
+            item.setNotes(no.getText());
+            popup.close();
+        });
+
+        back.setOnAction(e -> popup.close());
+
+        popup.setScene(new Scene(grid, 400, 300));
+        popup.showAndWait();
+    }
+
+    private void openDeleteConfirmation(Stage owner, Item item) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initOwner(owner);
+        popup.setTitle("Confirm Delete");
+
+        Label msg = new Label("Are you sure you want to delete this entry?");
+        Button yes = new Button("Yes");
+        Button no = new Button("No");
+
+        yes.setOnAction(e -> {
+            data.remove(item);
+            popup.close();
+        });
+
+        no.setOnAction(e -> popup.close());
+
+        HBox btnBox = new HBox(20, yes, no);
+        btnBox.setAlignment(Pos.CENTER);
+        VBox layout = new VBox(20, msg, btnBox);
+        layout.setAlignment(Pos.CENTER);
+
+        popup.setScene(new Scene(layout, 350, 150));
+        popup.showAndWait();
+    }
+
     // ----------------- Helper Class -----------------
     public static class Item {
-        private String site, username, password, notes;
+        private final StringProperty site;
+        private final StringProperty username;
+        private final StringProperty password;
+        private final StringProperty notes;
 
         public Item(String site, String username, String password, String notes) {
-            this.site = site;
-            this.username = username;
-            this.password = password;
-            this.notes = notes;
+            this.site = new SimpleStringProperty(site);
+            this.username = new SimpleStringProperty(username);
+            this.password = new SimpleStringProperty(password);
+            this.notes = new SimpleStringProperty(notes);
         }
 
-        public String getSite() { return site; }
-        public String getUsername() { return username; }
-        public String getPassword() { return password; }
-        public String getNotes() { return notes; }
+        public String getSite() { return site.get(); }
+        public void setSite(String value) { site.set(value); }
+        public StringProperty siteProperty() { return site; }
 
-        public void setSite(String site) { this.site = site; }
-        public void setUsername(String username) { this.username = username; }
-        public void setPassword(String password) { this.password = password; }
-        public void setNotes(String notes) { this.notes = notes; }
+        public String getUsername() { return username.get(); }
+        public void setUsername(String value) { username.set(value); }
+        public StringProperty usernameProperty() { return username; }
+
+        public String getPassword() { return password.get(); }
+        public void setPassword(String value) { password.set(value); }
+        public StringProperty passwordProperty() { return password; }
+
+        public String getNotes() { return notes.get(); }
+        public void setNotes(String value) { notes.set(value); }
+        public StringProperty notesProperty() { return notes; }
     }
 
     public static void main(String[] args) {

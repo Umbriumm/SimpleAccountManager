@@ -16,12 +16,12 @@ public class DBManager implements AutoCloseable {
     private static final String URL = "jdbc:sqlite:data.db";
     public static String init = "CREATE TABLE IF NOT EXISTS MT(" +
             "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            "SERVICE TEXT, " +
+            "SITE TEXT, " +
             "USER TEXT, " +
             "PASS TEXT, " +
             "NOTES TEXT)";
 
-    private static String Insert ="INSERT INTO MT(SERVICE,USER,PASS,NOTES) VALUES(?,?,?,?)";
+    private String Insert ="INSERT INTO MT(SITE,USER,PASS,NOTES) VALUES(?,?,?,?)";
 
     // The constructor initializes the DB if it did not exist
     public DBManager(String MasterPassword) {
@@ -36,11 +36,8 @@ public class DBManager implements AutoCloseable {
         }
     }
 
-    public void insertRecord(String SERVICE, String USER, String PASS, String NOTES) throws Exception {
+    public void insertRecord(String SITE, String USER, String PASS, String NOTES) throws CryptographyException {
 
-        if ((USER.isBlank() || USER == null || PASS.isBlank() || PASS == null )){
-            throw new InvalidInputException();
-        }
 
         try {
 
@@ -50,7 +47,7 @@ public class DBManager implements AutoCloseable {
             enc.init(MasterPassword);
 
             PreparedStatement pstmt = conn.prepareStatement(Insert);
-            pstmt.setString(1, enc.Encrypt(SERVICE));
+            pstmt.setString(1, enc.Encrypt(SITE));
             pstmt.setString(2, USER);
             pstmt.setString(3, PASS);
             pstmt.setString(4, NOTES);
@@ -59,11 +56,11 @@ public class DBManager implements AutoCloseable {
 
 
         } catch (SQLException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
-                 IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
+                 IllegalBlockSizeException | BadPaddingException | CryptographyException | InvalidAlgorithmParameterException e) {
 
             System.out.println("SQL or Encryption Error");
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new CryptographyException(e);
 
         }
 
@@ -86,7 +83,7 @@ public class DBManager implements AutoCloseable {
         }
     }
 
-    public static String getMasterPassword() {
+    public String getMasterPassword() {
         return MasterPassword;
     }
 }

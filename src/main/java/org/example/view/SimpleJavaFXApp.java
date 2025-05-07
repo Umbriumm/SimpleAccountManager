@@ -1,6 +1,6 @@
 package org.example.view;
 
-import javafx.animation.PauseTransition;
+import org.example.controller.*;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,14 +10,13 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.util.Duration;
+import org.example.model.CryptographyException;
 
 public class SimpleJavaFXApp extends Application {
     String passss = "s";
+    mainController controller;
 
     ObservableList<Item> data = FXCollections.observableArrayList();
 
@@ -39,8 +38,8 @@ public class SimpleJavaFXApp extends Application {
 
         // ----------------- TableView (Shared) -----------------
         TableView<Item> table = new TableView<>();
-        TableColumn<Item, String> col1 = new TableColumn<>("Service / Label");
-        col1.setCellValueFactory(new PropertyValueFactory<>("label"));
+        TableColumn<Item, String> col1 = new TableColumn<>("Site");
+        col1.setCellValueFactory(new PropertyValueFactory<>("site"));
         TableColumn<Item, String> col2 = new TableColumn<>("Username");
         col2.setCellValueFactory(new PropertyValueFactory<>("username"));
         TableColumn<Item, String> col3 = new TableColumn<>("Password");
@@ -74,7 +73,7 @@ public class SimpleJavaFXApp extends Application {
         HBox editBtnBox = new HBox(10, save, back); // Aligned next to each other
 
         GridPane s3 = new GridPane();
-        s3.add(new Label("Service / Label"), 0, 0);
+        s3.add(new Label("Site"), 0, 0);
         s3.add(sl, 1, 0);
         s3.add(new Label("Username"), 0, 1);
         s3.add(use, 1, 1);
@@ -102,7 +101,7 @@ public class SimpleJavaFXApp extends Application {
 
 
         GridPane s4 = new GridPane();
-        s4.add(new Label("Service / Label"), 0, 0);
+        s4.add(new Label("Site"), 0, 0);
         s4.add(slAdd, 1, 0);
         s4.add(new Label("Username"), 0, 1);
         s4.add(useAdd, 1, 1);
@@ -134,12 +133,16 @@ public class SimpleJavaFXApp extends Application {
 
         // ----------------- Button Actions -----------------
         enter.setOnAction(e -> {
-            if (mp.getText().equals(passss)) {
-                stage.setScene(scene2);
-                stage.setTitle("Dashboard");
-            } else {
-                new Alert(Alert.AlertType.ERROR, "Wrong Password!").showAndWait();
-            }
+            controller = new mainController(mp.getText());
+            stage.setScene(scene2);
+            stage.setTitle("Dashboard");
+
+//            if (mp.getText().equals(passss)) {
+//                stage.setScene(scene2);
+//                stage.setTitle("Dashboard");
+//            } else {
+//                new Alert(Alert.AlertType.ERROR, "Wrong Password!").showAndWait();
+//            }
         });
 
         exitBtn.setOnAction(e -> {
@@ -158,6 +161,11 @@ public class SimpleJavaFXApp extends Application {
 
         saveAdd.setOnAction(e -> {
             data.add(new Item(slAdd.getText(), useAdd.getText(), psAdd.getText(), noAdd.getText()));
+            try {
+                controller.insertRecord(slAdd.getText(),useAdd.getText(), psAdd.getText(), noAdd.getText());
+            } catch (CryptographyException ex) {
+
+            }
             stage.setScene(scene2);
         });
 
@@ -166,7 +174,7 @@ public class SimpleJavaFXApp extends Application {
         editBtn.setOnAction(e -> {
             Item selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                sl.setText(selected.getLabel());
+                sl.setText(selected.getSite());
                 use.setText(selected.getUsername());
                 ps.setText(selected.getPassword());
                 no.setText(selected.getNotes());
@@ -180,7 +188,7 @@ public class SimpleJavaFXApp extends Application {
         save.setOnAction(e -> {
             Item selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                selected.setLabel(sl.getText());
+                selected.setSite(sl.getText());
                 selected.setUsername(use.getText());
                 selected.setPassword(ps.getText());
                 selected.setNotes(no.getText());
@@ -217,21 +225,21 @@ public class SimpleJavaFXApp extends Application {
 
     // ----------------- Helper Class -----------------
     public static class Item {
-        private String label, username, password, notes;
+        private String site, username, password, notes;
 
-        public Item(String label, String username, String password, String notes) {
-            this.label = label;
+        public Item(String site, String username, String password, String notes) {
+            this.site = site;
             this.username = username;
             this.password = password;
             this.notes = notes;
         }
 
-        public String getLabel() { return label; }
+        public String getSite() { return site; }
         public String getUsername() { return username; }
         public String getPassword() { return password; }
         public String getNotes() { return notes; }
 
-        public void setLabel(String label) { this.label = label; }
+        public void setSite(String site) { this.site = site; }
         public void setUsername(String username) { this.username = username; }
         public void setPassword(String password) { this.password = password; }
         public void setNotes(String notes) { this.notes = notes; }

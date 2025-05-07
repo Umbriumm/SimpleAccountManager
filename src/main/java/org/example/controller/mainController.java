@@ -1,15 +1,20 @@
 package org.example.controller;
 
+import org.example.model.CryptographyException;
 import org.example.model.DBManager;
 
 public class mainController {
 
-    static DBManager DBM = new DBManager(DBManager.getMasterPassword());
+    DBManager DBM;
 
-    // Exceptions will be rethrown from here and caught by the UI
+    public mainController(String masterpassword){
+        DBM = new DBManager(masterpassword);
+    }
 
-    public static void insertRecord(String Label, String Username, String Password, String Notes) throws Exception {
-        DBM.insertRecord(Label, Username, Password, Notes);
+
+
+    public void insertRecord(String Site, String Username, String Password, String Notes) throws CryptographyException{
+        DBM.insertRecord(Site, Username, Password, Notes);
     }
 
     public static void editRecord(int id){

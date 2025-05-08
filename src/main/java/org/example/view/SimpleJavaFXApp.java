@@ -72,15 +72,17 @@ public class SimpleJavaFXApp extends Application {
         enter.setOnAction(e -> {
             controller = new mainController(mp.getText());
 
-            String sql = "SELECT * site FROM MT";
-                    try (Connection conn = controller.getConnection();
+            String sql = "SELECT * FROM MT";
+            Connection conn = controller.getConnection();
+                    try (
                          Statement stmt = conn.createStatement();
                          ResultSet rs = stmt.executeQuery(sql)) {
+                         data.clear();
                         while (rs.next()) {
-                            String site = rs.getString("site");
-                            String user = rs.getString("username");
-                            String pass = (rs.getString("password")); // or however you handle it
-                            String notes = rs.getString("notes");
+                            String site = rs.getString("SITE");
+                            String user = rs.getString("USER");
+                            String pass = (rs.getString("PASS")); // or however you handle it
+                            String notes = rs.getString("NOTES");
                             data.add(new Item(site, user, pass, notes));
                         }
                     } catch (SQLException e2) {

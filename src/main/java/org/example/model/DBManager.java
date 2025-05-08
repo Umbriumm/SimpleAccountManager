@@ -66,10 +66,34 @@ public class DBManager implements AutoCloseable {
 
     }
 
-    public void deleteRecord(){}
+    public void deleteRecord(int id ) throws  SQLException{
+        String sql= "DELETE FROM MT WHERE ID = ?";
+        try(PreparedStatement ptsmt=conn.prepareStatement(sql)){
+            ptsmt.setInt(1, id);
+            ptsmt.executeUpdate();
+        } catch (SQLException e){
+            System.out.println("Failed to delete record with ID" + id);
+            e.printStackTrace();
+        }
+
+    }
 
 
-    public void editRecord(){}
+    public void editRecord(int id, String SITE,String USER,String PASS,String NOTES)throws CryptographyException{
+        String sql= "UPDATE MT SET SITE = ?, USER = ?, PASS = ?, NOTES = ? WHERE ID = ?";
+        EncryptionHandler enc = new EncryptionHandler();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(2, USER);
+            pstmt.setString(3, enc.Encrypt(PASS));
+            pstmt.setInt(5, id);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Failed to update record with ID " + id);
+            e.printStackTrace();
+            throw new CryptographyException(e);
+        }
+
+    }
 
 
     // This function is required to use try-with-resources

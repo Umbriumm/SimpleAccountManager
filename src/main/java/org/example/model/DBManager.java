@@ -21,7 +21,6 @@ public class DBManager implements AutoCloseable {
             "PASS TEXT, " +
             "NOTES TEXT)";
 
-    private String Insert ="INSERT INTO MT(SITE,USER,PASS,NOTES) VALUES(?,?,?,?)";
 
     // The constructor initializes the DB if it did not exist
     public DBManager(String MasterPassword) {
@@ -38,6 +37,7 @@ public class DBManager implements AutoCloseable {
 
     public void insertRecord(String SITE, String USER, String PASS, String NOTES) throws CryptographyException {
 
+       String Insert ="INSERT INTO MT(SITE,USER,PASS,NOTES) VALUES(?,?,?,?)";
 
         try {
 
@@ -47,9 +47,9 @@ public class DBManager implements AutoCloseable {
             enc.init(MasterPassword);
 
             PreparedStatement pstmt = conn.prepareStatement(Insert);
-            pstmt.setString(1, enc.Encrypt(SITE));
+            pstmt.setString(1, SITE);
             pstmt.setString(2, USER);
-            pstmt.setString(3, PASS);
+            pstmt.setString(3, enc.Encrypt(PASS));
             pstmt.setString(4, NOTES);
 
             pstmt.executeUpdate();
@@ -110,4 +110,9 @@ public class DBManager implements AutoCloseable {
     public String getMasterPassword() {
         return MasterPassword;
     }
+
+    public Connection getConnection() {
+        return this.conn;
+    }
+
 }

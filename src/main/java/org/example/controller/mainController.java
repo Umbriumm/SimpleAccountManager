@@ -3,12 +3,16 @@ package org.example.controller;
 import org.example.model.CryptographyException;
 import org.example.model.DBManager;
 
+import java.sql.Connection;
+
 public class mainController {
 
     DBManager DBM;
+    private Connection connection;
 
     public mainController(String masterpassword){
         DBM = new DBManager(masterpassword);
+
     }
 
 
@@ -24,4 +28,9 @@ public class mainController {
     public static void deleteRecord(int id){
         // delete method
     }
+
+    public Connection getConnection() {
+        return DBM.getConnection();
+    }
+
 }

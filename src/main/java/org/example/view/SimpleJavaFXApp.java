@@ -14,8 +14,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.model.CryptographyException;
 import javafx.stage.Modality;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class SimpleJavaFXApp extends Application {
     String passss = "s";
@@ -24,6 +27,7 @@ public class SimpleJavaFXApp extends Application {
 
     @Override
     public void start(Stage stage) {
+       //controller.
         // ----------------- Scene 1: Password Entry -----------------
         PasswordField mp = new PasswordField();
         Label eymp = new Label("Enter Your Master Password");
@@ -67,6 +71,23 @@ public class SimpleJavaFXApp extends Application {
         // ----------------- Button Actions -----------------
         enter.setOnAction(e -> {
             controller = new mainController(mp.getText());
+
+            String sql = "SELECT * site FROM MT";
+                    try (Connection conn = controller.getConnection();
+                         Statement stmt = conn.createStatement();
+                         ResultSet rs = stmt.executeQuery(sql)) {
+                        while (rs.next()) {
+                            String site = rs.getString("site");
+                            String user = rs.getString("username");
+                            String pass = (rs.getString("password")); // or however you handle it
+                            String notes = rs.getString("notes");
+                            data.add(new Item(site, user, pass, notes));
+                        }
+                    } catch (SQLException e2) {
+                        e2.printStackTrace();
+                    }
+
+
             stage.setScene(scene2);
             stage.setTitle("Dashboard");
         });
@@ -218,35 +239,7 @@ public class SimpleJavaFXApp extends Application {
     }
 
     // ----------------- Helper Class -----------------
-    public static class Item {
-        private final StringProperty site;
-        private final StringProperty username;
-        private final StringProperty password;
-        private final StringProperty notes;
 
-        public Item(String site, String username, String password, String notes) {
-            this.site = new SimpleStringProperty(site);
-            this.username = new SimpleStringProperty(username);
-            this.password = new SimpleStringProperty(password);
-            this.notes = new SimpleStringProperty(notes);
-        }
-
-        public String getSite() { return site.get(); }
-        public void setSite(String value) { site.set(value); }
-        public StringProperty siteProperty() { return site; }
-
-        public String getUsername() { return username.get(); }
-        public void setUsername(String value) { username.set(value); }
-        public StringProperty usernameProperty() { return username; }
-
-        public String getPassword() { return password.get(); }
-        public void setPassword(String value) { password.set(value); }
-        public StringProperty passwordProperty() { return password; }
-
-        public String getNotes() { return notes.get(); }
-        public void setNotes(String value) { notes.set(value); }
-        public StringProperty notesProperty() { return notes; }
-    }
 
     public static void main(String[] args) {
         launch();

@@ -26,7 +26,7 @@ public class DBManager implements AutoCloseable {
     public DBManager(String MasterPassword) {
         this.MasterPassword = MasterPassword;
         try{
-            Connection conn = DriverManager.getConnection(URL);
+            this.conn = DriverManager.getConnection(URL);
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(init);
 
@@ -41,12 +41,10 @@ public class DBManager implements AutoCloseable {
 
         try {
 
-            Connection conn = DriverManager.getConnection(URL);
-
             EncryptionHandler enc = new EncryptionHandler();
             enc.init(MasterPassword);
 
-            PreparedStatement pstmt = conn.prepareStatement(Insert);
+            PreparedStatement pstmt = this.conn.prepareStatement(Insert);
             pstmt.setString(1, SITE);
             pstmt.setString(2, USER);
             pstmt.setString(3, enc.Encrypt(PASS));
@@ -66,9 +64,9 @@ public class DBManager implements AutoCloseable {
 
     }
 
-    public void deleteRecord(int id ) throws  SQLException{
+    public void deleteRecord(int id) throws  SQLException{
         String sql= "DELETE FROM MT WHERE ID = ?";
-        try(PreparedStatement ptsmt=conn.prepareStatement(sql)){
+        try(PreparedStatement ptsmt=this.conn.prepareStatement(sql)){
             ptsmt.setInt(1, id);
             ptsmt.executeUpdate();
         } catch (SQLException e){
@@ -82,10 +80,11 @@ public class DBManager implements AutoCloseable {
     public void editRecord(int id, String SITE,String USER,String PASS,String NOTES)throws CryptographyException{
         String sql= "UPDATE MT SET SITE = ?, USER = ?, PASS = ?, NOTES = ? WHERE ID = ?";
         EncryptionHandler enc = new EncryptionHandler();
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = this.conn.prepareStatement(sql)) {
+            pstmt.setString(1, SITE);
             pstmt.setString(2, USER);
             pstmt.setString(3, enc.Encrypt(PASS));
-            pstmt.setInt(5, id);
+            pstmt.setString(4, NOTES);
             pstmt.executeUpdate();
         } catch (Exception e) {
             System.out.println("Failed to update record with ID " + id);
@@ -102,8 +101,8 @@ public class DBManager implements AutoCloseable {
     // and it is a part of the autoClosable interface implemented above
     @Override
     public void close() throws Exception {
-        if(conn != null && !conn.isClosed()){
-            conn.close();
+        if(this.conn != null && !this.conn.isClosed()){
+            this.conn.close();
         }
     }
 

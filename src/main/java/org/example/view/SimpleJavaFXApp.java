@@ -310,7 +310,7 @@ public class SimpleJavaFXApp extends Application {
         userField.setPrefWidth(200);
 
         Label passLabel = new Label("Password");
-        TextField passField = new TextField(item.getPassword()); // Changed from PasswordField
+        TextField passField = new TextField(item.getPassword());
         passField.setEditable(false);
         passField.setPrefWidth(200);
 

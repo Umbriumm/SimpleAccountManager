@@ -1,4 +1,5 @@
 package org.example.view;
+import javafx.geometry.Insets;
 import org.example.model.Item;
 import org.example.controller.*;
 import javafx.application.Application;
@@ -58,9 +59,10 @@ public class SimpleJavaFXApp extends Application {
         Button addBtn = new Button("ADD");
         Button delBtn = new Button("Delete");
         Button editBtn = new Button("EDIT");
+        Button detailsBtn = new Button("DETAILS");
         Button exitBtn = new Button("EXIT");
 
-        ToolBar toolbar = new ToolBar(addBtn, delBtn, editBtn, new Separator(), exitBtn);
+        ToolBar toolbar = new ToolBar(addBtn, delBtn, editBtn, detailsBtn, new Separator(), exitBtn);
         VBox layout2 = new VBox(toolbar, table);
         layout2.setSpacing(10);
         Scene scene2 = new Scene(layout2, 700, 500);
@@ -102,6 +104,14 @@ public class SimpleJavaFXApp extends Application {
                 openDeleteConfirmation(stage, SelectedItem);
             } else {
                 new Alert(Alert.AlertType.WARNING, "Select an item to delete").showAndWait();
+            }
+        });
+        detailsBtn.setOnAction(e -> {
+            Item selected = table.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                showDetailsPopup(selected);
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Please select a row to view details").showAndWait();
             }
         });
 
@@ -249,6 +259,58 @@ public class SimpleJavaFXApp extends Application {
 
         popup.setScene(new Scene(layout, 350, 150));
         popup.showAndWait();
+    }
+
+    private void showDetailsPopup(Item item) {
+        Stage detailStage = new Stage();
+        detailStage.initModality(Modality.APPLICATION_MODAL);
+        detailStage.setTitle("Details");
+
+        // Left column
+        Label userLabel = new Label("Username");
+        TextField userField = new TextField(item.getUsername());
+        userField.setEditable(false);
+        userField.setPrefWidth(200);
+
+        Label passLabel = new Label("Password");
+        PasswordField passField = new PasswordField();
+        passField.setText(item.getPassword());
+        passField.setEditable(false);
+        passField.setPrefWidth(200);
+
+        VBox leftBox = new VBox(15, userLabel, userField, passLabel, passField);
+        leftBox.setAlignment(Pos.TOP_LEFT);
+
+        // Right column
+        Label siteLabel = new Label("Site");
+        TextField siteField = new TextField(item.getSite());
+        siteField.setEditable(false);
+        siteField.setPrefWidth(200);
+
+        Label noteLabel = new Label("Note");
+        TextField noteField = new TextField(item.getNotes());
+        noteField.setEditable(false);
+        noteField.setPrefWidth(200);
+
+        VBox rightBox = new VBox(15, siteLabel, siteField, noteLabel, noteField);
+        rightBox.setAlignment(Pos.TOP_LEFT);
+
+        HBox mainContent = new HBox(30, leftBox, rightBox);
+        mainContent.setPadding(new Insets(20));
+        mainContent.setAlignment(Pos.CENTER);
+
+        Button closeBtn = new Button("Close");
+        HBox btnBox = new HBox(closeBtn);
+        btnBox.setAlignment(Pos.CENTER);
+        btnBox.setPadding(new Insets(10));
+
+        closeBtn.setOnAction(e -> detailStage.close());
+
+        VBox layout = new VBox(20, mainContent, btnBox);
+        layout.setPadding(new Insets(10));
+        Scene scene = new Scene(layout, 500, 300);
+        detailStage.setScene(scene);
+        detailStage.showAndWait();
     }
 
     // ----------------- Helper Class -----------------

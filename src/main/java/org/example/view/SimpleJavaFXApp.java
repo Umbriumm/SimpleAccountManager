@@ -310,10 +310,10 @@ public class SimpleJavaFXApp extends Application {
         userField.setPrefWidth(200);
 
         Label passLabel = new Label("Password");
-        PasswordField passField = new PasswordField();
-        passField.setText(item.getPassword());
+        TextField passField = new TextField(item.getPassword()); // Changed from PasswordField
         passField.setEditable(false);
         passField.setPrefWidth(200);
+
 
         VBox leftBox = new VBox(15, userLabel, userField, passLabel, passField);
         leftBox.setAlignment(Pos.TOP_LEFT);

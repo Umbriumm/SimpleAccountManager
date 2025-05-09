@@ -1,5 +1,5 @@
 package org.example.view;
-
+import org.example.model.Item;
 import org.example.controller.*;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -15,15 +15,12 @@ import javafx.stage.Stage;
 import org.example.model.CryptographyException;
 import javafx.stage.Modality;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class SimpleJavaFXApp extends Application {
-    String passss = "s";
     mainController controller;
-    ObservableList<Item> data = FXCollections.observableArrayList();
+    ObservableList<Item> dataL = FXCollections.observableArrayList();
 
     @Override
     public void start(Stage stage) {
@@ -54,7 +51,7 @@ public class SimpleJavaFXApp extends Application {
         col4.setCellValueFactory(new PropertyValueFactory<>("notes"));
 
         table.getColumns().addAll(col1, col2, col3, col4);
-        table.setItems(data);
+        table.setItems(dataL);
         table.setPlaceholder(new Label("TABLE"));
 
         // ----------------- Scene 2: Dashboard Table -----------------
@@ -70,25 +67,15 @@ public class SimpleJavaFXApp extends Application {
 
         // ----------------- Button Actions -----------------
         enter.setOnAction(e -> {
-            controller = new mainController(mp.getText());
-
-            String sql = "SELECT * FROM MT";
-            Connection conn = controller.getConnection();
-                    try (
-                         Statement stmt = conn.createStatement();
-                         ResultSet rs = stmt.executeQuery(sql)) {
-                         data.clear();
-                        while (rs.next()) {
-                            String site = rs.getString("SITE");
-                            String user = rs.getString("USER");
-                            String pass = (rs.getString("PASS")); // or however you handle it
-                            String notes = rs.getString("NOTES");
-                            data.add(new Item(site, user, pass, notes));
-                        }
-                    } catch (SQLException e2) {
-                        e2.printStackTrace();
-                    }
-
+            try {
+                controller = new mainController(mp.getText());
+            } catch (CryptographyException ex) {
+                throw new RuntimeException(ex);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new RuntimeException(ex);
+            }
+            dataL.clear();
+            dataL.addAll(controller.loadAllItems());
 
             stage.setScene(scene2);
             stage.setTitle("Dashboard");
@@ -101,18 +88,18 @@ public class SimpleJavaFXApp extends Application {
 
         addBtn.setOnAction(e -> openAddWindow(stage));
         editBtn.setOnAction(e -> {
-            Item selected = table.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                openEditWindow(stage, selected);
+            Item SelectedItem = table.getSelectionModel().getSelectedItem();
+            if (SelectedItem != null) {
+                openEditWindow(stage, SelectedItem);
             } else {
                 new Alert(Alert.AlertType.WARNING, "Please select a row to edit").showAndWait();
             }
         });
 
         delBtn.setOnAction(e -> {
-            Item selected = table.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                openDeleteConfirmation(stage, selected);
+            Item SelectedItem = table.getSelectionModel().getSelectedItem();
+            if (SelectedItem != null) {
+                openDeleteConfirmation(stage, SelectedItem);
             } else {
                 new Alert(Alert.AlertType.WARNING, "Select an item to delete").showAndWait();
             }
@@ -155,13 +142,19 @@ public class SimpleJavaFXApp extends Application {
         grid.setVgap(10);
 
         save.setOnAction(e -> {
-            Item newItem = new Item(sl.getText(), use.getText(), ps.getText(), no.getText());
-//            ((SimpleJavaFXApp) Application.getUserAgentStylesheet()).data.add(newItem);    Working to solve this part
-            data.add(newItem); // just use it directly
+
+            if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || ps.getText().trim().isEmpty()) {
+                new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.").showAndWait();
+                return; // Stop if fields are empty
+            }
+
             try {
                 controller.insertRecord(sl.getText(), use.getText(), ps.getText(), no.getText());
             } catch (CryptographyException ignored) {}
             popup.close();
+
+            dataL.clear();
+            dataL.addAll(controller.loadAllItems());
         });
 
         back.setOnAction(e -> popup.close());
@@ -170,16 +163,16 @@ public class SimpleJavaFXApp extends Application {
         popup.showAndWait();
     }
 
-    private void openEditWindow(Stage owner, Item item) {
+    private void openEditWindow(Stage owner, Item SelectedItem) {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
         popup.initOwner(owner);
         popup.setTitle("Edit Account");
 
-        TextField sl = new TextField(item.getSite());
-        TextField use = new TextField(item.getUsername());
-        TextField ps = new TextField(item.getPassword());
-        TextField no = new TextField(item.getNotes());
+        TextField sl = new TextField(SelectedItem.getSite());
+        TextField use = new TextField(SelectedItem.getUsername());
+        TextField ps = new TextField(SelectedItem.getPassword());
+        TextField no = new TextField(SelectedItem.getNotes());
 
         Button save = new Button("Save");
         Button back = new Button("Back");
@@ -201,11 +194,22 @@ public class SimpleJavaFXApp extends Application {
         grid.setVgap(10);
 
         save.setOnAction(e -> {
-            item.setSite(sl.getText());
-            item.setUsername(use.getText());
-            item.setPassword(ps.getText());
-            item.setNotes(no.getText());
+
+            if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || ps.getText().trim().isEmpty()) {
+                new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.").showAndWait();
+                return; // Stop if fields are empty
+            }
+
+            try {
+                controller.updateRecord(SelectedItem.getID(), sl.getText(), use.getText(), ps.getText(), no.getText());
+            } catch (CryptographyException ex) {
+                throw new RuntimeException(ex);
+            }
+
             popup.close();
+
+            dataL.clear();
+            dataL.addAll(controller.loadAllItems());
         });
 
         back.setOnAction(e -> popup.close());
@@ -214,7 +218,7 @@ public class SimpleJavaFXApp extends Application {
         popup.showAndWait();
     }
 
-    private void openDeleteConfirmation(Stage owner, Item item) {
+    private void openDeleteConfirmation(Stage owner, Item SelectedItem) {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
         popup.initOwner(owner);
@@ -225,8 +229,15 @@ public class SimpleJavaFXApp extends Application {
         Button no = new Button("No");
 
         yes.setOnAction(e -> {
-            data.remove(item);
+            try {
+                controller.deleteRecord(SelectedItem.getID());
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             popup.close();
+
+            dataL.clear();
+            dataL.addAll(controller.loadAllItems());
         });
 
         no.setOnAction(e -> popup.close());

@@ -139,7 +139,7 @@ public class DBManager implements AutoCloseable {
     }
 
     public Item idSearch(String username){
-        String query = "SELECT * FROM MT WHERE username = ?";
+        String query = "SELECT * FROM MT WHERE USER = ?";
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 

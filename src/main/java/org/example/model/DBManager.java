@@ -138,12 +138,12 @@ public class DBManager implements AutoCloseable {
         return conn;
     }
 
-    public Item idSearch(int userid){
+    public Item idSearch(String username){
         String query = "SELECT * FROM MT WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            pstmt.setInt(1,userid) ;
+            pstmt.setString(3,username);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -156,7 +156,7 @@ public class DBManager implements AutoCloseable {
                     return new Item(ID,service,user,pass,note);
 
                 } else {
-                    System.out.println("No user found with ID: " + userid);
+                    System.out.println("No user found with ID: " + username);
                 }
             }
 

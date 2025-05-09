@@ -44,12 +44,12 @@ public class SimpleJavaFXApp extends Application {
         col1.setCellValueFactory(new PropertyValueFactory<>("site"));
         TableColumn<Item, String> col2 = new TableColumn<>("Username");
         col2.setCellValueFactory(new PropertyValueFactory<>("username"));
-        TableColumn<Item, String> col3 = new TableColumn<>("Password");
-        col3.setCellValueFactory(new PropertyValueFactory<>("password"));
+//        TableColumn<Item, String> col3 = new TableColumn<>("Password");
+//        col3.setCellValueFactory(new PropertyValueFactory<>("password"));
         TableColumn<Item, String> col4 = new TableColumn<>("Notes");
         col4.setCellValueFactory(new PropertyValueFactory<>("notes"));
 
-        table.getColumns().addAll(col1, col2, col3, col4);
+        table.getColumns().addAll(col1, col2, col4);
         table.setItems(dataL);
         table.setPlaceholder(new Label("TABLE"));
 

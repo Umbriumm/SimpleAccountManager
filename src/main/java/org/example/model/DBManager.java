@@ -166,5 +166,9 @@ public class DBManager implements AutoCloseable {
         }
         return null; //if the user is not found or if the databses has an erorr
     }
+
+    public String retrieve(String s) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        return (enc.Decrypt(s));
+    }
 }
 

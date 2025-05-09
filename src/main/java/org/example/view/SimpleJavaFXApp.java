@@ -93,7 +93,7 @@ public class SimpleJavaFXApp extends Application {
 
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        ToolBar toolbar = new ToolBar(addBtn, delBtn, editBtn, detailsBtn,new Separator(),SearchPane ,searchField,searchButton, new Separator(),spacer, exitBtn);
+        ToolBar toolbar = new ToolBar(addBtn, editBtn, detailsBtn, delBtn,new Separator(),SearchPane ,searchField,searchButton, new Separator(),spacer, exitBtn);
 
         VBox layout2 = new VBox(toolbar, table);
         layout2.setSpacing(10);
@@ -166,8 +166,27 @@ public class SimpleJavaFXApp extends Application {
 
         TextField sl = new TextField();
         TextField use = new TextField();
-        TextField ps = new TextField();
+        PasswordField maskedPs = new PasswordField();
+        TextField unmaskedPs = new TextField();
         TextField no = new TextField();
+
+        maskedPs.setPrefWidth(200);
+        unmaskedPs.setPrefWidth(200);
+        unmaskedPs.setVisible(false);
+        unmaskedPs.setManaged(false);
+
+        // Sync both fields
+        maskedPs.textProperty().bindBidirectional(unmaskedPs.textProperty());
+
+        ToggleButton toggle = new ToggleButton("👁️");
+        toggle.selectedProperty().addListener((obs, oldVal, isSelected) -> {
+            maskedPs.setVisible(!isSelected);
+            maskedPs.setManaged(!isSelected);
+            unmaskedPs.setVisible(isSelected);
+            unmaskedPs.setManaged(isSelected);
+        });
+
+        HBox passwordBox = new HBox(5, maskedPs, unmaskedPs, toggle);
 
         Button save = new Button("Save");
         Button back = new Button("Back");
@@ -180,7 +199,7 @@ public class SimpleJavaFXApp extends Application {
         grid.add(new Label("Username"), 0, 1);
         grid.add(use, 1, 1);
         grid.add(new Label("Password"), 0, 2);
-        grid.add(ps, 1, 2);
+        grid.add(passwordBox, 1, 2);
         grid.add(new Label("Notes"), 0, 3);
         grid.add(no, 1, 3);
         grid.add(btnBox, 1, 4);
@@ -189,14 +208,13 @@ public class SimpleJavaFXApp extends Application {
         grid.setVgap(10);
 
         save.setOnAction(e -> {
-
-            if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || ps.getText().trim().isEmpty()) {
+            if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || maskedPs.getText().trim().isEmpty()) {
                 new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.").showAndWait();
-                return; // Stop if fields are empty
+                return;
             }
 
             try {
-                controller.insertRecord(sl.getText(), use.getText(), ps.getText(), no.getText());
+                controller.insertRecord(sl.getText(), use.getText(), maskedPs.getText(), no.getText());
             } catch (CryptographyException ignored) {}
             popup.close();
 
@@ -206,7 +224,7 @@ public class SimpleJavaFXApp extends Application {
 
         back.setOnAction(e -> popup.close());
 
-        popup.setScene(new Scene(grid, 400, 300));
+        popup.setScene(new Scene(grid, 450, 300));
         popup.showAndWait();
     }
 
@@ -218,8 +236,32 @@ public class SimpleJavaFXApp extends Application {
 
         TextField sl = new TextField(SelectedItem.getSite());
         TextField use = new TextField(SelectedItem.getUsername());
-        TextField ps = new TextField();
         TextField no = new TextField(SelectedItem.getNotes());
+
+        // Masked + Unmasked password fields
+        PasswordField maskedPs = new PasswordField();
+        TextField unmaskedPs = new TextField();
+        maskedPs.setPrefWidth(200);
+        unmaskedPs.setPrefWidth(200);
+        unmaskedPs.setVisible(false);
+        unmaskedPs.setManaged(false);
+
+        // Set initial password text
+        maskedPs.setText(SelectedItem.getPassword());
+        unmaskedPs.setText(SelectedItem.getPassword());
+
+        // Bind both fields
+        maskedPs.textProperty().bindBidirectional(unmaskedPs.textProperty());
+
+        ToggleButton toggle = new ToggleButton("👁️");
+        toggle.selectedProperty().addListener((obs, oldVal, isSelected) -> {
+            maskedPs.setVisible(!isSelected);
+            maskedPs.setManaged(!isSelected);
+            unmaskedPs.setVisible(isSelected);
+            unmaskedPs.setManaged(isSelected);
+        });
+
+        HBox passwordBox = new HBox(5, maskedPs, unmaskedPs, toggle);
 
         Button save = new Button("Save");
         Button back = new Button("Back");
@@ -232,7 +274,7 @@ public class SimpleJavaFXApp extends Application {
         grid.add(new Label("Username"), 0, 1);
         grid.add(use, 1, 1);
         grid.add(new Label("Password"), 0, 2);
-        grid.add(ps, 1, 2);
+        grid.add(passwordBox, 1, 2);
         grid.add(new Label("Notes"), 0, 3);
         grid.add(no, 1, 3);
         grid.add(btnBox, 1, 4);
@@ -241,27 +283,31 @@ public class SimpleJavaFXApp extends Application {
         grid.setVgap(10);
 
         save.setOnAction(e -> {
-
-            if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || ps.getText().trim().isEmpty()) {
+            if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || maskedPs.getText().trim().isEmpty()) {
                 new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.").showAndWait();
-                return; // Stop if fields are empty
+                return;
             }
 
             try {
-                controller.updateRecord(SelectedItem.getID(), sl.getText(), use.getText(), ps.getText(), no.getText());
+                controller.updateRecord(
+                        SelectedItem.getID(),
+                        sl.getText(),
+                        use.getText(),
+                        maskedPs.getText(),
+                        no.getText()
+                );
             } catch (CryptographyException ex) {
                 throw new RuntimeException(ex);
             }
 
             popup.close();
-
             dataL.clear();
             dataL.addAll(controller.loadAllItems());
         });
 
         back.setOnAction(e -> popup.close());
 
-        popup.setScene(new Scene(grid, 400, 300));
+        popup.setScene(new Scene(grid, 450, 300));
         popup.showAndWait();
     }
 
@@ -375,7 +421,7 @@ public class SimpleJavaFXApp extends Application {
 
         VBox layout = new VBox(20, mainContent, btnBox);
         layout.setPadding(new Insets(10));
-        Scene scene = new Scene(layout, 500, 300);
+        Scene scene = new Scene(layout, 550, 350);
         detailStage.setScene(scene);
         detailStage.showAndWait();
     }

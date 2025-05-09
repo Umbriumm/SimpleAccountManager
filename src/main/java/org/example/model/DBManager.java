@@ -143,7 +143,7 @@ public class DBManager implements AutoCloseable {
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            pstmt.setString(3,username);
+            pstmt.setString(1,username);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {

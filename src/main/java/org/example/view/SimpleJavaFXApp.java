@@ -51,6 +51,7 @@ public class SimpleJavaFXApp extends Application {
         table.setItems(dataL);
         table.setPlaceholder(new Label("TABLE"));
 
+
         // ----------------- Scene 2: Dashboard Table -----------------
         Button addBtn = new Button("ADD");
         Button delBtn = new Button("Delete");
@@ -67,6 +68,7 @@ public class SimpleJavaFXApp extends Application {
         clearButton.setStyle("-fx-background-radius: 5em;");
         clearButton.setStyle("-fx-background-color: transparent; -fx-padding: 0 5 0 0;");
         clearButton.setVisible(false);
+
 
         // StackPane to overlay the button on the TextField
         StackPane SearchPane = new StackPane();
@@ -93,9 +95,9 @@ public class SimpleJavaFXApp extends Application {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         ToolBar toolbar = new ToolBar(addBtn, delBtn, editBtn, detailsBtn,new Separator(),SearchPane ,searchField,searchButton, new Separator(),spacer, exitBtn);
 
-
         VBox layout2 = new VBox(toolbar, table);
         layout2.setSpacing(10);
+        VBox.setVgrow(table, Priority.ALWAYS);
         Scene scene2 = new Scene(layout2, 700, 500);
 
         // ----------------- Button Actions -----------------

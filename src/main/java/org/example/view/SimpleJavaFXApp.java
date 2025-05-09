@@ -218,7 +218,7 @@ public class SimpleJavaFXApp extends Application {
 
         TextField sl = new TextField(SelectedItem.getSite());
         TextField use = new TextField(SelectedItem.getUsername());
-        TextField ps = new TextField(SelectedItem.getPassword());
+        TextField ps = new TextField();
         TextField no = new TextField(SelectedItem.getNotes());
 
         Button save = new Button("Save");
@@ -310,12 +310,41 @@ public class SimpleJavaFXApp extends Application {
         userField.setPrefWidth(200);
 
         Label passLabel = new Label("Password");
-        TextField passField = new TextField(item.getPassword());
-        passField.setEditable(false);
-        passField.setPrefWidth(200);
+        PasswordField maskedField = new PasswordField();
+        TextField unmaskedField = new TextField();
+        unmaskedField.setEditable(false);
+        unmaskedField.setPrefWidth(200);
+        maskedField.textProperty().bindBidirectional(unmaskedField.textProperty()); // bind masked to unmasked content-wise
+        maskedField.setText(item.getPassword());
+        maskedField.setEditable(false);
+        maskedField.setPrefWidth(200);
+
+        ToggleButton maskToggle = new ToggleButton("👁️"); // visibility toggle
 
 
-        VBox leftBox = new VBox(15, userLabel, userField, passLabel, passField);
+        HBox passwordDisplay = new HBox(0);
+        passwordDisplay.getChildren().addAll(maskedField, unmaskedField);
+        passwordDisplay.getChildren().add(maskToggle);  // ensuring that this gets added last, sometimes it overlaps
+        passwordDisplay.setSpacing(5);
+
+        unmaskedField.setVisible(false);
+        unmaskedField.setManaged(false);  // setManaged(false) means that the layout is not going to include this component at the moment
+
+        maskToggle.selectedProperty().addListener((observable, oldvalue, isSelected) -> {
+            if (isSelected) {
+                maskedField.setVisible(false);
+                maskedField.setManaged(false);
+                unmaskedField.setVisible(true);
+                unmaskedField.setManaged(true);
+            } else {
+                maskedField.setVisible(true);
+                maskedField.setManaged(true);
+                unmaskedField.setVisible(false);
+                unmaskedField.setManaged(false);
+            }
+        });
+
+        VBox leftBox = new VBox(15, userLabel, userField, passLabel, passwordDisplay);
         leftBox.setAlignment(Pos.TOP_LEFT);
 
         // Right column
@@ -328,6 +357,7 @@ public class SimpleJavaFXApp extends Application {
         TextField noteField = new TextField(item.getNotes());
         noteField.setEditable(false);
         noteField.setPrefWidth(200);
+
 
         VBox rightBox = new VBox(15, siteLabel, siteField, noteLabel, noteField);
         rightBox.setAlignment(Pos.TOP_LEFT);

@@ -144,14 +144,14 @@ public class DBManager implements AutoCloseable {
         try (
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1,searchTerm);
-            pstmt.setString(2,searchTerm);
-            pstmt.setString(3,searchTerm);
+            pstmt.setString(1,"%" + searchTerm + "%");
+            pstmt.setString(2,"%" + searchTerm + "%");
+            pstmt.setString(3,"%" + searchTerm + "%");
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     int ID = rs.getInt("Id");
-                    String site = rs.getString("SERVICE");
+                    String site = rs.getString("SITE");
                     String user = rs.getString("USER");
                     String pass = rs.getString("PASS");
                     String note = rs.getString("NOTES");

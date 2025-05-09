@@ -37,6 +37,8 @@ public class mainController {
         return DBM.getAllItems();
     }
 
+    public List<Item> searchResult(String searchTerm){ return DBM.Search(searchTerm); }
+
     public Connection getConnection() {
         return DBM.getConnection();
     }

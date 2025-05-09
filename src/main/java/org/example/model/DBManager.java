@@ -138,27 +138,30 @@ public class DBManager implements AutoCloseable {
         return conn;
     }
 
-    public Item idSearch(String username){
-        String query = "SELECT * FROM MT WHERE USER = ?";
-        try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+    public List<Item> Search(String searchTerm){
+        List<Item> query = new ArrayList<>();
+        String sql = "SELECT * FROM MT WHERE SITE LIKE ? OR USER LIKE ? OR NOTES LIKE ?";
+        try (
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(3,username);
+            pstmt.setString(1,searchTerm);
+            pstmt.setString(2,searchTerm);
+            pstmt.setString(3,searchTerm);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     int ID = rs.getInt("Id");
-                    String service = rs.getString("SITE");
+                    String site = rs.getString("SERVICE");
                     String user = rs.getString("USER");
                     String pass = rs.getString("PASS");
                     String note = rs.getString("NOTES");
 
-                    return new Item(ID,service,user,pass,note);
-
+                    query.add(new Item(ID, site, user, pass, note));
                 } else {
-                    System.out.println("No user found with ID: " + username);
+                    System.out.println("No Entries Found");
                 }
             }
+            return query;
 
         } catch (SQLException e) {
             System.out.println("Database error: " + e.getMessage());

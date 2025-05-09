@@ -4,6 +4,11 @@ import org.example.model.CryptographyException;
 import org.example.model.DBManager;
 import org.example.model.Item;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -39,6 +44,10 @@ public class mainController {
 
     public List<Item> searchResult(String searchTerm){
         return DBM.Search(searchTerm);
+    }
+
+    public String retrieve(String s) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        return (DBM.retrieve(s));
     }
 
     public Connection getConnection() {

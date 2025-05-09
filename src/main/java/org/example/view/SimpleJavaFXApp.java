@@ -1,5 +1,6 @@
 package org.example.view;
 import javafx.geometry.Insets;
+import javafx.scene.layout.*;
 import org.example.model.Item;
 import org.example.controller.*;
 import javafx.application.Application;
@@ -9,9 +10,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.model.CryptographyException;
 import javafx.stage.Modality;
@@ -61,8 +59,15 @@ public class SimpleJavaFXApp extends Application {
         Button editBtn = new Button("EDIT");
         Button detailsBtn = new Button("DETAILS");
         Button exitBtn = new Button("EXIT");
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search...");
+        searchField.setPrefWidth(300);
+        Button searchButton = new Button("Search");
+        HBox spacer = new HBox();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        ToolBar toolbar = new ToolBar(addBtn, delBtn, editBtn, detailsBtn,new Separator(), searchField,searchButton, new Separator(),spacer, exitBtn);
 
-        ToolBar toolbar = new ToolBar(addBtn, delBtn, editBtn, detailsBtn, new Separator(), exitBtn);
+
         VBox layout2 = new VBox(toolbar, table);
         layout2.setSpacing(10);
         Scene scene2 = new Scene(layout2, 700, 500);
@@ -114,7 +119,10 @@ public class SimpleJavaFXApp extends Application {
                 new Alert(Alert.AlertType.WARNING, "Please select a row to view details").showAndWait();
             }
         });
+        // -------------------Search --------------------
+        searchButton.setOnAction(e -> {
 
+        });
         // ----------------- Launch -----------------
         stage.setTitle("Code Program");
         stage.setScene(scene1);

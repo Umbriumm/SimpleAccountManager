@@ -148,7 +148,7 @@ public class DBManager implements AutoCloseable {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     int ID = rs.getInt("Id");
-                    String service = rs.getString("SERVICE");
+                    String service = rs.getString("SITE");
                     String user = rs.getString("USER");
                     String pass = rs.getString("PASS");
                     String note = rs.getString("NOTES");

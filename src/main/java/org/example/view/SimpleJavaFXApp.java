@@ -149,7 +149,8 @@ public class SimpleJavaFXApp extends Application {
         });
         // -------------------Search --------------------
         searchButton.setOnAction(e -> {
-
+            dataL.clear();
+            dataL.addAll(controller.searchResult(searchField.getText()));
         });
         // ----------------- Launch -----------------
         stage.setTitle("Code Program");

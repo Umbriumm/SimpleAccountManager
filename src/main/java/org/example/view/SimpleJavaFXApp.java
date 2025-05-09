@@ -63,9 +63,37 @@ public class SimpleJavaFXApp extends Application {
         searchField.setPromptText("Search...");
         searchField.setPrefWidth(300);
         Button searchButton = new Button("Search");
+
+
+        Button clearButton = new Button("✕");
+        clearButton.setStyle("-fx-background-radius: 5em;");
+        clearButton.setStyle("-fx-background-color: transparent; -fx-padding: 0 5 0 0;");
+        clearButton.setVisible(false);
+
+        // StackPane to overlay the button on the TextField
+        StackPane SearchPane = new StackPane();
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER_RIGHT);
+        hBox.getChildren().add(clearButton);
+        SearchPane.getChildren().addAll(searchField, hBox);
+
+        // Make the button appear only when there's text
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            clearButton.setVisible(!newVal.isEmpty());
+        });
+
+        // Clear the text when the button is clicked
+        clearButton.setOnAction(e ->{
+
+                searchField.clear();
+                dataL.clear();
+                dataL.addAll(controller.loadAllItems());
+
+        });
+
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        ToolBar toolbar = new ToolBar(addBtn, delBtn, editBtn, detailsBtn,new Separator(), searchField,searchButton, new Separator(),spacer, exitBtn);
+        ToolBar toolbar = new ToolBar(addBtn, delBtn, editBtn, detailsBtn,new Separator(),SearchPane ,searchField,searchButton, new Separator(),spacer, exitBtn);
 
 
         VBox layout2 = new VBox(toolbar, table);

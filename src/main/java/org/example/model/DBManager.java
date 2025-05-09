@@ -138,4 +138,32 @@ public class DBManager implements AutoCloseable {
         return conn;
     }
 
+    public Item idSearch(int userid){
+        String query = "SELECT * FROM users WHERE id = ?";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1,userid) ;
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int ID = rs.getInt("Id");
+                    String service = rs.getString("SERVICE");
+                    String user = rs.getString("USER");
+                    String pass = rs.getString("PASS");
+                    String note = rs.getString("NOTES");
+
+                    return new Item(ID,service,user,pass,note);
+
+                } else {
+                    System.out.println("No user found with ID: " + userid);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
+        return null; //if the user is not found or if the databses has an erorr
+    }
 }
+

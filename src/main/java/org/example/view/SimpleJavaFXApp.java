@@ -17,6 +17,7 @@ import javafx.stage.Modality;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.io.File;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -104,6 +105,9 @@ public class SimpleJavaFXApp extends Application {
         layout2.setSpacing(10);
         VBox.setVgrow(table, Priority.ALWAYS);
         Scene scene2 = new Scene(layout2, 700, 500);
+        // ------------------ CSS Applying -----------------------
+        scene1.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+        scene2.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
 
         // ----------------- Button Actions -----------------
         enter.setOnAction(e -> {
@@ -146,7 +150,10 @@ public class SimpleJavaFXApp extends Application {
                     throw new RuntimeException(ex);
                 }
             } else {
-                new Alert(Alert.AlertType.WARNING, "Please select a row to edit").showAndWait();
+                Alert alert= new Alert(Alert.AlertType.WARNING, "Please select a row to edit");
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+                alert.showAndWait();
             }
         });
 
@@ -155,7 +162,10 @@ public class SimpleJavaFXApp extends Application {
             if (SelectedItem != null) {
                 openDeleteConfirmation(stage, SelectedItem);
             } else {
-                new Alert(Alert.AlertType.WARNING, "Select an item to delete").showAndWait();
+               Alert alert1 = new Alert(Alert.AlertType.WARNING, "Select an item to delete");
+                DialogPane dialogPane1 = alert1.getDialogPane();
+                dialogPane1.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+                alert1.showAndWait();
             }
         });
         detailsBtn.setOnAction(e -> {
@@ -177,7 +187,11 @@ public class SimpleJavaFXApp extends Application {
                     throw new RuntimeException(ex);
                 }
             } else {
-                new Alert(Alert.AlertType.WARNING, "Please select a row to view details").showAndWait();
+               Alert alert2= new Alert(Alert.AlertType.WARNING, "Please select a row to view details");
+                DialogPane dialogPane2 = alert2.getDialogPane();
+                dialogPane2.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+                alert2.showAndWait();
+
             }
         });
         // -------------------Search --------------------
@@ -242,7 +256,11 @@ public class SimpleJavaFXApp extends Application {
 
         save.setOnAction(e -> {
             if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || maskedPs.getText().trim().isEmpty()) {
-                new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.").showAndWait();
+            Alert alert3 = new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.");
+                DialogPane dialogPane3 = alert3.getDialogPane();
+                dialogPane3.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+                alert3.showAndWait();
+
                 return;
             }
 
@@ -257,8 +275,14 @@ public class SimpleJavaFXApp extends Application {
 
         back.setOnAction(e -> popup.close());
 
-        popup.setScene(new Scene(grid, 450, 300));
+        //popup.setScene(new Scene(grid, 450, 300));
+        Scene scene22 = new Scene(grid, 450, 300);
+        scene22.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+
+        popup.setScene(scene22);
         popup.showAndWait();
+
+
     }
 
     private void openEditWindow(Stage owner, Item SelectedItem) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
@@ -318,8 +342,11 @@ public class SimpleJavaFXApp extends Application {
 
         save.setOnAction(e -> {
             if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || maskedPs.getText().trim().isEmpty()) {
-                new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.").showAndWait();
-                return;
+               Alert alert4= new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.");
+                DialogPane dialogPane4 = alert4.getDialogPane();
+                dialogPane4.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+                alert4.showAndWait();
+               return;
             }
 
             try {
@@ -341,8 +368,13 @@ public class SimpleJavaFXApp extends Application {
 
         back.setOnAction(e -> popup.close());
 
-        popup.setScene(new Scene(grid, 450, 300));
+        //popup.setScene(new Scene(grid, 450, 300));
+        Scene scene22 = new Scene(grid, 450, 300);
+        scene22.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+
+        popup.setScene(scene22);
         popup.showAndWait();
+
     }
 
     private void openDeleteConfirmation(Stage owner, Item SelectedItem) {
@@ -374,7 +406,12 @@ public class SimpleJavaFXApp extends Application {
         VBox layout = new VBox(20, msg, btnBox);
         layout.setAlignment(Pos.CENTER);
 
-        popup.setScene(new Scene(layout, 350, 150));
+        //popup.setScene(new Scene(layout, 350, 150));
+
+        Scene scene22 = new Scene(layout, 350, 150);
+        scene22.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+
+        popup.setScene(scene22);
         popup.showAndWait();
     }
 
@@ -456,9 +493,13 @@ public class SimpleJavaFXApp extends Application {
         VBox layout = new VBox(20, mainContent, btnBox);
         layout.setPadding(new Insets(10));
         Scene scene = new Scene(layout, 550, 350);
+        scene.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
         detailStage.setScene(scene);
         detailStage.showAndWait();
+
+
     }
+
 
     // ----------------- Helper Class -----------------
 

@@ -126,8 +126,9 @@ public class SimpleJavaFXApp extends Application {
 //
 //                }
 
-            } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException |
-                     SQLException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException ex) {
+            } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | SQLException |
+                     NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | CryptographyException |
+                     InvalidKeyException ex) {
 
                 Alert alert = new Alert(Alert.AlertType.WARNING, "An error occured while trying to decrypt");
                 DialogPane dialogPane = alert.getDialogPane();
@@ -136,17 +137,10 @@ public class SimpleJavaFXApp extends Application {
                 return;
 
 
-            } catch (CryptographyException | InvalidKeyException ex) {
-                // TODO: handle this exception GUI-wise
-
-                Alert alert = new Alert(Alert.AlertType.WARNING, "An error occured while trying to decrypt");
-                DialogPane dialogPane = alert.getDialogPane();
-                dialogPane.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
-                alert.showAndWait();
-                return;
             }
             dataL.clear();
             dataL.addAll(controller.loadAllItems());
+            Sort.sortItemsBySite(dataL);
 
             stage.setScene(scene2);
             stage.setTitle("Dashboard");
@@ -192,17 +186,8 @@ public class SimpleJavaFXApp extends Application {
             if (SelectedItem != null) {
                 try {
                     openEditWindow(stage, SelectedItem);
-                } catch (InvalidAlgorithmParameterException ex) {
-                    throw new RuntimeException(ex);
-                } catch (NoSuchPaddingException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IllegalBlockSizeException ex) {
-                    throw new RuntimeException(ex);
-                } catch (NoSuchAlgorithmException ex) {
-                    throw new RuntimeException(ex);
-                } catch (BadPaddingException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InvalidKeyException ex) {
+                } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
+                         NoSuchAlgorithmException | BadPaddingException | InvalidKeyException ex) {
                     throw new RuntimeException(ex);
                 }
             } else {
@@ -229,17 +214,8 @@ public class SimpleJavaFXApp extends Application {
             if (selected != null) {
                 try {
                     showDetailsPopup(selected);
-                } catch (InvalidAlgorithmParameterException ex) {
-                    throw new RuntimeException(ex);
-                } catch (NoSuchPaddingException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IllegalBlockSizeException ex) {
-                    throw new RuntimeException(ex);
-                } catch (NoSuchAlgorithmException ex) {
-                    throw new RuntimeException(ex);
-                } catch (BadPaddingException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InvalidKeyException ex) {
+                } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
+                         NoSuchAlgorithmException | BadPaddingException | InvalidKeyException ex) {
                     throw new RuntimeException(ex);
                 }
             } else {
@@ -254,6 +230,7 @@ public class SimpleJavaFXApp extends Application {
         searchButton.setOnAction(e -> {
             dataL.clear();
             dataL.addAll(controller.searchResult(searchField.getText()));
+            Sort.sortItemsBySite(dataL);
         });
         // ----------------- Launch -----------------
         stage.setTitle("Code Program");
@@ -281,7 +258,7 @@ public class SimpleJavaFXApp extends Application {
         // Sync both fields
         maskedPs.textProperty().bindBidirectional(unmaskedPs.textProperty());
 
-        ToggleButton toggle = new ToggleButton("👁️");
+        ToggleButton toggle = new ToggleButton("Show️");
         toggle.selectedProperty().addListener((obs, oldVal, isSelected) -> {
             maskedPs.setVisible(!isSelected);
             maskedPs.setManaged(!isSelected);
@@ -328,6 +305,7 @@ public class SimpleJavaFXApp extends Application {
 
             dataL.clear();
             dataL.addAll(controller.loadAllItems());
+            Sort.sortItemsBySite(dataL);
         });
 
         back.setOnAction(e -> popup.close());
@@ -367,7 +345,7 @@ public class SimpleJavaFXApp extends Application {
         maskedPs.setText(controller.retrieve(SelectedItem.getPassword()));
 
 
-        ToggleButton toggle = new ToggleButton("👁️");
+        ToggleButton toggle = new ToggleButton("Show️");
         toggle.selectedProperty().addListener((obs, oldVal, isSelected) -> {
             maskedPs.setVisible(!isSelected);
             maskedPs.setManaged(!isSelected);
@@ -420,6 +398,7 @@ public class SimpleJavaFXApp extends Application {
             popup.close();
             dataL.clear();
             dataL.addAll(controller.loadAllItems());
+            Sort.sortItemsBySite(dataL);
         });
 
         back.setOnAction(e -> popup.close());
@@ -453,6 +432,7 @@ public class SimpleJavaFXApp extends Application {
 
             dataL.clear();
             dataL.addAll(controller.loadAllItems());
+            Sort.sortItemsBySite(dataL);
         });
 
         no.setOnAction(e -> popup.close());
@@ -492,7 +472,7 @@ public class SimpleJavaFXApp extends Application {
         maskedField.setEditable(false);
         maskedField.setPrefWidth(200);
 
-        ToggleButton maskToggle = new ToggleButton("👁️"); // visibility toggle
+        ToggleButton maskToggle = new ToggleButton("Show️"); // visibility toggle
 
 
         HBox passwordDisplay = new HBox(0);

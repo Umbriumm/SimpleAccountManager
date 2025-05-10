@@ -18,7 +18,6 @@ public class DBManager implements AutoCloseable,DB {
     private Connection conn;
     private static String MasterPassword;
     EncryptionHandler enc = new EncryptionHandler();
-    File dbfile;
 
     private static final String URL = "jdbc:sqlite:data.db";
 
@@ -172,7 +171,7 @@ public class DBManager implements AutoCloseable,DB {
         } catch (SQLException e) {
             System.out.println("Database error: " + e.getMessage());
         }
-        return null; //if the user is not found or if the databses has an erorr
+        return null; //if the user is not found or if the databses has an error
     }
 
     public String retrieve(String s) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {

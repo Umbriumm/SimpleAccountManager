@@ -3,7 +3,7 @@ package org.example.model;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class Item {
+public class Item implements ItemsGettersSetters {
     private int ID;
     private final StringProperty site;
     private final StringProperty username;

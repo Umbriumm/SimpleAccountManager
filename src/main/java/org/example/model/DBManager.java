@@ -13,7 +13,7 @@ import java.util.List;
 
 // General DB operations
 
-public class DBManager implements AutoCloseable {
+public class DBManager implements AutoCloseable,DB {
 
     private Connection conn;
     private static String MasterPassword;

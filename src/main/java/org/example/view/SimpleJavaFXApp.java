@@ -1,4 +1,6 @@
 package org.example.view;
+
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import org.example.model.Item;
@@ -18,6 +20,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.File;
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -29,17 +32,21 @@ public class SimpleJavaFXApp extends Application {
 
     @Override
     public void start(Stage stage) {
-       //controller.
+        //controller.
         // ----------------- Scene 1: Password Entry -----------------
         PasswordField mp = new PasswordField();
         Label eymp = new Label("Enter Your Master Password");
         Button enter = new Button("Enter");
+        Button wipe = new Button("Forgot your password?");
 
         GridPane sc1 = new GridPane();
         sc1.add(eymp, 1, 0);
         sc1.add(mp, 1, 1);
         sc1.add(enter, 1, 2);
+        sc1.add(wipe, 1, 3);
         sc1.setAlignment(Pos.CENTER);
+        GridPane.setHalignment(enter, HPos.CENTER);
+        GridPane.setHalignment(wipe, HPos.CENTER);
         sc1.setHgap(10);
         sc1.setVgap(10);
         Scene scene1 = new Scene(sc1, 500, 400);
@@ -89,17 +96,17 @@ public class SimpleJavaFXApp extends Application {
         });
 
         // Clear the text when the button is clicked
-        clearButton.setOnAction(e ->{
+        clearButton.setOnAction(e -> {
 
-                searchField.clear();
-                dataL.clear();
-                dataL.addAll(controller.loadAllItems());
+            searchField.clear();
+            dataL.clear();
+            dataL.addAll(controller.loadAllItems());
 
         });
 
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        ToolBar toolbar = new ToolBar(addBtn, editBtn, detailsBtn, delBtn,new Separator(),SearchPane ,searchField,searchButton, new Separator(),spacer, exitBtn);
+        ToolBar toolbar = new ToolBar(addBtn, editBtn, detailsBtn, delBtn, new Separator(), SearchPane, searchField, searchButton, new Separator(), spacer, exitBtn);
 
         VBox layout2 = new VBox(toolbar, table);
         layout2.setSpacing(10);
@@ -113,16 +120,65 @@ public class SimpleJavaFXApp extends Application {
         enter.setOnAction(e -> {
             try {
                 controller = new mainController(mp.getText());
-            } catch (CryptographyException ex) {
-                throw new RuntimeException(ex);
-            } catch (NoSuchAlgorithmException ex) {
-                throw new RuntimeException(ex);
+
+                controller.Validate();
+//                if (controller.Validate() != true){    // 117 should already do the trick
+//
+//                }
+
+            } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException |
+                     SQLException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException ex) {
+
+                Alert alert = new Alert(Alert.AlertType.WARNING, "An error occured while trying to decrypt");
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+                alert.showAndWait();
+                return;
+
+
+            } catch (CryptographyException | InvalidKeyException ex) {
+                // TODO: handle this exception GUI-wise
+
+                Alert alert = new Alert(Alert.AlertType.WARNING, "An error occured while trying to decrypt");
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
+                alert.showAndWait();
+                return;
             }
             dataL.clear();
             dataL.addAll(controller.loadAllItems());
 
             stage.setScene(scene2);
             stage.setTitle("Dashboard");
+        });
+
+        wipe.setOnAction(e -> {
+            try {
+                controller = new mainController(mp.getText());
+            } catch (CryptographyException ex) {
+                throw new RuntimeException(ex);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new RuntimeException(ex);
+            }
+            TextInputDialog inputDialog = new TextInputDialog();
+            inputDialog.setTitle("Confirmation");
+            inputDialog.setHeaderText("Are you sure you want to delete all data?");
+            inputDialog.setContentText("Type 'yes' to confirm:");
+
+            String result = inputDialog.showAndWait().get();
+
+            if (result != null && result.equalsIgnoreCase("yes")) {
+                // Proceed with reset
+                System.out.println("Data will be deleted.");
+                try {
+                    controller.selfDestruct();
+                } catch (IOException | SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                // Handle cancellation or incorrect input
+                System.out.println("Action canceled or invalid input.");
+            }
         });
 
         exitBtn.setOnAction(e -> {
@@ -150,7 +206,7 @@ public class SimpleJavaFXApp extends Application {
                     throw new RuntimeException(ex);
                 }
             } else {
-                Alert alert= new Alert(Alert.AlertType.WARNING, "Please select a row to edit");
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Please select a row to edit");
                 DialogPane dialogPane = alert.getDialogPane();
                 dialogPane.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
                 alert.showAndWait();
@@ -162,7 +218,7 @@ public class SimpleJavaFXApp extends Application {
             if (SelectedItem != null) {
                 openDeleteConfirmation(stage, SelectedItem);
             } else {
-               Alert alert1 = new Alert(Alert.AlertType.WARNING, "Select an item to delete");
+                Alert alert1 = new Alert(Alert.AlertType.WARNING, "Select an item to delete");
                 DialogPane dialogPane1 = alert1.getDialogPane();
                 dialogPane1.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
                 alert1.showAndWait();
@@ -187,7 +243,7 @@ public class SimpleJavaFXApp extends Application {
                     throw new RuntimeException(ex);
                 }
             } else {
-               Alert alert2= new Alert(Alert.AlertType.WARNING, "Please select a row to view details");
+                Alert alert2 = new Alert(Alert.AlertType.WARNING, "Please select a row to view details");
                 DialogPane dialogPane2 = alert2.getDialogPane();
                 dialogPane2.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
                 alert2.showAndWait();
@@ -256,7 +312,7 @@ public class SimpleJavaFXApp extends Application {
 
         save.setOnAction(e -> {
             if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || maskedPs.getText().trim().isEmpty()) {
-            Alert alert3 = new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.");
+                Alert alert3 = new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.");
                 DialogPane dialogPane3 = alert3.getDialogPane();
                 dialogPane3.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
                 alert3.showAndWait();
@@ -266,7 +322,8 @@ public class SimpleJavaFXApp extends Application {
 
             try {
                 controller.insertRecord(sl.getText(), use.getText(), maskedPs.getText(), no.getText());
-            } catch (CryptographyException ignored) {}
+            } catch (CryptographyException ignored) {
+            }
             popup.close();
 
             dataL.clear();
@@ -310,7 +367,6 @@ public class SimpleJavaFXApp extends Application {
         maskedPs.setText(controller.retrieve(SelectedItem.getPassword()));
 
 
-
         ToggleButton toggle = new ToggleButton("👁️");
         toggle.selectedProperty().addListener((obs, oldVal, isSelected) -> {
             maskedPs.setVisible(!isSelected);
@@ -342,11 +398,11 @@ public class SimpleJavaFXApp extends Application {
 
         save.setOnAction(e -> {
             if (sl.getText().trim().isEmpty() || use.getText().trim().isEmpty() || maskedPs.getText().trim().isEmpty()) {
-               Alert alert4= new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.");
+                Alert alert4 = new Alert(Alert.AlertType.WARNING, "Site, Username, and Password are required.");
                 DialogPane dialogPane4 = alert4.getDialogPane();
                 dialogPane4.getStylesheets().add((new File("src/main/java/org/example/view/style.css")).toURI().toString());
                 alert4.showAndWait();
-               return;
+                return;
             }
 
             try {

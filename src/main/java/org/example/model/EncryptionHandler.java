@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Base64;
 
-class EncryptionHandler {
+ public class EncryptionHandler {
     protected transient SecretKey key;
     protected transient Cipher encryptionCipher;    // Must be transient because Gson cannot access it
     protected transient String EncodedIV;

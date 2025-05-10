@@ -14,6 +14,11 @@ import javafx.stage.Stage;
 import org.example.model.CryptographyException;
 import javafx.stage.Modality;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
@@ -125,7 +130,21 @@ public class SimpleJavaFXApp extends Application {
         editBtn.setOnAction(e -> {
             Item SelectedItem = table.getSelectionModel().getSelectedItem();
             if (SelectedItem != null) {
-                openEditWindow(stage, SelectedItem);
+                try {
+                    openEditWindow(stage, SelectedItem);
+                } catch (InvalidAlgorithmParameterException ex) {
+                    throw new RuntimeException(ex);
+                } catch (NoSuchPaddingException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IllegalBlockSizeException ex) {
+                    throw new RuntimeException(ex);
+                } catch (NoSuchAlgorithmException ex) {
+                    throw new RuntimeException(ex);
+                } catch (BadPaddingException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InvalidKeyException ex) {
+                    throw new RuntimeException(ex);
+                }
             } else {
                 new Alert(Alert.AlertType.WARNING, "Please select a row to edit").showAndWait();
             }
@@ -142,7 +161,21 @@ public class SimpleJavaFXApp extends Application {
         detailsBtn.setOnAction(e -> {
             Item selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                showDetailsPopup(selected);
+                try {
+                    showDetailsPopup(selected);
+                } catch (InvalidAlgorithmParameterException ex) {
+                    throw new RuntimeException(ex);
+                } catch (NoSuchPaddingException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IllegalBlockSizeException ex) {
+                    throw new RuntimeException(ex);
+                } catch (NoSuchAlgorithmException ex) {
+                    throw new RuntimeException(ex);
+                } catch (BadPaddingException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InvalidKeyException ex) {
+                    throw new RuntimeException(ex);
+                }
             } else {
                 new Alert(Alert.AlertType.WARNING, "Please select a row to view details").showAndWait();
             }
@@ -228,7 +261,7 @@ public class SimpleJavaFXApp extends Application {
         popup.showAndWait();
     }
 
-    private void openEditWindow(Stage owner, Item SelectedItem) {
+    private void openEditWindow(Stage owner, Item SelectedItem) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
         popup.initOwner(owner);
@@ -246,12 +279,13 @@ public class SimpleJavaFXApp extends Application {
         unmaskedPs.setVisible(false);
         unmaskedPs.setManaged(false);
 
-        // Set initial password text
-        maskedPs.setText(SelectedItem.getPassword());
-        unmaskedPs.setText(SelectedItem.getPassword());
-
         // Bind both fields
         maskedPs.textProperty().bindBidirectional(unmaskedPs.textProperty());
+
+        // Set initial password text
+        maskedPs.setText(controller.retrieve(SelectedItem.getPassword()));
+
+
 
         ToggleButton toggle = new ToggleButton("👁️");
         toggle.selectedProperty().addListener((obs, oldVal, isSelected) -> {
@@ -344,7 +378,7 @@ public class SimpleJavaFXApp extends Application {
         popup.showAndWait();
     }
 
-    private void showDetailsPopup(Item item) {
+    private void showDetailsPopup(Item item) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         Stage detailStage = new Stage();
         detailStage.initModality(Modality.APPLICATION_MODAL);
         detailStage.setTitle("Details");
@@ -361,7 +395,7 @@ public class SimpleJavaFXApp extends Application {
         unmaskedField.setEditable(false);
         unmaskedField.setPrefWidth(200);
         maskedField.textProperty().bindBidirectional(unmaskedField.textProperty()); // bind masked to unmasked content-wise
-        maskedField.setText(item.getPassword());
+        maskedField.setText(controller.retrieve(item.getPassword()));
         maskedField.setEditable(false);
         maskedField.setPrefWidth(200);
 

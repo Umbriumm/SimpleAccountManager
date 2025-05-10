@@ -1,12 +1,11 @@
 package org.example.controller;
 
-import org.example.model.CryptographyException;
-import org.example.model.DBManager;
-import org.example.model.Item;
+import org.example.model.*;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -16,12 +15,14 @@ import java.util.List;
 
 public class mainController {
 
+    EncryptionHandler enc = new EncryptionHandler();
     DBManager DBM;
+    ValidateMasterpassword VMP = new ValidateMasterpassword();
     private Connection connection;
 
     public mainController(String masterpassword) throws CryptographyException, NoSuchAlgorithmException {
         DBM = new DBManager(masterpassword);
-
+        enc.init(masterpassword);
     }
 
 
@@ -47,11 +48,19 @@ public class mainController {
     }
 
     public String retrieve(String s) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        return (DBM.retrieve(s));
+        return (enc.Decrypt(s));
     }
 
     public Connection getConnection() {
         return DBM.getConnection();
+    }
+
+    public boolean Validate() throws InvalidAlgorithmParameterException, CryptographyException, SQLException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        return VMP.isValid(DBM, DBM.getMasterPassword());
+    }
+
+    public boolean selfDestruct() throws IOException, SQLException {
+       return DBM.selfDestruct();
     }
 
 }

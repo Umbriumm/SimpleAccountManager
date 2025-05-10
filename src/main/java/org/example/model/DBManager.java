@@ -2,6 +2,8 @@ package org.example.model;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.io.File;
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -16,6 +18,7 @@ public class DBManager implements AutoCloseable {
     private Connection conn;
     private static String MasterPassword;
     EncryptionHandler enc = new EncryptionHandler();
+    File dbfile;
 
     private static final String URL = "jdbc:sqlite:data.db";
 
@@ -30,15 +33,20 @@ public class DBManager implements AutoCloseable {
                 "PASS TEXT, " +
                 "NOTES TEXT)";
 
+        String initHeader = "CREATE TABLE IF NOT EXISTS HEADER(H TEXT)";
+
         enc.init(MasterPassword);
         try{
             conn = DriverManager.getConnection(URL);
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(init);
+            stmt.executeUpdate(initHeader);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+
     }
 
     public void insertRecord(String SITE, String USER, String PASS, String NOTES) throws CryptographyException {
@@ -170,5 +178,41 @@ public class DBManager implements AutoCloseable {
     public String retrieve(String s) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return (enc.Decrypt(s));
     }
+
+    public void insertHeader(String encryptedHeader) throws SQLException {
+        String insert = "INSERT INTO HEADER(H) VALUES(?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(insert)) {
+            pstmt.setString(1, encryptedHeader);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public String getHeader() throws SQLException {
+        String query = "SELECT H FROM HEADER";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                return rs.getString("H");
+            }
+            return null;
+        }
+    }
+
+    public boolean selfDestruct() {
+
+        String[] tables = {"MT", "HEADER", "sqlite_sequence"};
+
+        for (String s : tables){
+            String DeleteQuery = "DELETE FROM " + s;
+
+            try (Statement stmt = conn.createStatement()) {
+                stmt.executeUpdate(DeleteQuery);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return true;
+    }
+
 }
 

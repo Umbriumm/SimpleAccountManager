@@ -42,6 +42,7 @@ target/
 
 ### Misc ###
 Passwords.json
+data.db
 
 ### Eclipse ###
 .apt_generated

@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model_old;
 import java.util.List;
 
 public interface Encryption {

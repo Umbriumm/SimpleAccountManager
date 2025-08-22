@@ -1,14 +1,28 @@
 package org.example;
-import org.example.model.AccountEntry;
-import org.example.model.AccountRemover;
-import org.example.model.PasswordEditor;
+import org.example.model.DBManager;
+import org.example.model.InvalidInputException;
+import org.example.model_old.AccountEntry;
+import org.example.model_old.AccountRemover;
+import org.example.model_old.PasswordEditor;
 
 import java.util.*;
 
+// This is the testing grounds for now
+// !!!! THIS IS EXPERIMENTAL !!!! //
+
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
 
+//        DBManager db = new DBManager();
+//        try {
+//            db.insertRecord("","i","p","");
+//        } catch (InvalidInputException e) {
+//            System.out.println("s");
+//        }
+
+
+
+        Scanner scanner = new Scanner(System.in);
 
 
         System.out.println("Enter Master Password for Encryption/Decryption:");
@@ -29,10 +43,7 @@ public class Main {
                 System.out.print("Enter Label: ");
                 System.out.println("Make sure every LABEL is unique per entry! ");
                 String label = scanner.nextLine();
-                if (AccountEntry.loadByLabel(label)) {
-                    System.out.println("Entries can't share the same label");
-                    System.exit(0);
-                }
+
                 System.out.print("Enter Service Name: ");
                 String service = scanner.nextLine();
 
@@ -42,19 +53,14 @@ public class Main {
                 System.out.print("Enter Password: ");
                 String password = scanner.nextLine();
 
-                AccountEntry newAccount = new AccountEntry(label, service, username, password);
+                System.out.print("Feel free to add any notes to this entry, if not, leave it empty");
+                String Notes = scanner.nextLine();
 
-                try {
-                    AccountEntry accountEntry=new AccountEntry();
-                    List<AccountEntry> accounts = accountEntry.readFromJson();
-                    accounts.add(newAccount);
-
-                    newAccount.saveToJson(accounts, masterPassword);
-                    System.out.println("\nAccount added successfully!");
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+               try (DBManager DBM = new DBManager(masterPassword)) {
+                   DBM.insertRecord(service, username, password, Notes);
+               } catch (Exception e) {
+                   throw new RuntimeException(e);
+               }
 
             } else if (choice.equals("2")) {
 

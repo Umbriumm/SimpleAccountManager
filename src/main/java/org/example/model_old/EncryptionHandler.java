@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model_old;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Base64;
 
- public class EncryptionHandler implements  EncryptionMethods {
+class EncryptionHandler {
     protected transient SecretKey key;
     protected transient Cipher encryptionCipher;    // Must be transient because Gson cannot access it
     protected transient String EncodedIV;
@@ -15,7 +15,7 @@ import java.util.Base64;
     }
 
     // Pass a MasterPassword to the handler to initialize
-    public void init(String password) throws CryptographyException, NoSuchAlgorithmException {
+    public void init(String password) throws Exception {
         // Derive a 256-bit key from the password using SHA-256 hash
         key = new SecretKeySpec(sha256(password), "AES");
     }
@@ -42,11 +42,7 @@ import java.util.Base64;
     }
 
     // Decrypt the message
-    public String Decrypt(String encryptedData) throws NoSuchPaddingException,
-            NoSuchAlgorithmException, InvalidKeyException,
-            IllegalBlockSizeException, BadPaddingException,
-            InvalidAlgorithmParameterException {
-
+    public String Decrypt(String encryptedData) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         String[] parts = encryptedData.split(":");
         String EncodedIV = parts[0];
         String cipherText = parts[1];
